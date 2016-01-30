@@ -2,11 +2,16 @@ package com.example.abhisheksinha.listviewexample;
 
 import android.app.Fragment;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -36,16 +41,39 @@ import managers.MovieDataManager;
 public class MainFragment extends Fragment{
     private ProgressBar spinner;
     final String BASE_URL = "https://api.themoviedb.org/3/discover/movie?";
-    final String API_KEY = "xxxxxxx";
+    final String API_KEY = "xxxxxxxxxxx";
     final String SORT_QUERY_PARAM = "sort_by";
     final String MOVIE_DATA = "movie_data";
     private ImageWithTextAdapter imageWithTextAdapter;
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
+        PreferenceManager.setDefaultValues(getActivity(), R.xml.pref_final, false);
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        spinner = (ProgressBar) getActivity().findViewById(R.id.spinnerView);
+        spinner.setVisibility(View.VISIBLE);
+        FetchTask t = new FetchTask();
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String syncConnPref = sharedPref.getString(SettingsActivity.SORT_PREF_KEY, "");
+        Log.i(MainFragment.class.getSimpleName(), syncConnPref);
+        t.execute(syncConnPref);
+    }
+
+    @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_example, container, false);
-        FetchTask t = new FetchTask();
-        t.execute("popularity.desc");
+
+//        FetchTask t = new FetchTask();
+//        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+//        String syncConnPref = sharedPref.getString(SettingsActivity.SORT_PREF_KEY, "");
+//        Log.i(MainFragment.class.getSimpleName(), syncConnPref);
+//        t.execute("popularity.desc");
         List<MovieDataManager> dummyList = new ArrayList<MovieDataManager>();
         imageWithTextAdapter = new ImageWithTextAdapter(getActivity(),dummyList);
         GridView lv = (GridView) rootView;
@@ -67,6 +95,22 @@ public class MainFragment extends Fragment{
         return rootView;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+        inflater.inflate(R.menu.menu_main, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_settings) {
+            Intent intent = new Intent(getActivity(), SettingsActivity.class);
+            startActivity(intent);
+        }
+        return true;
+    }
+
     public class FetchTask extends AsyncTask<String, Void, List<MovieDataManager>> {
         @Override
         protected List<MovieDataManager> doInBackground(String... params) {
@@ -81,6 +125,7 @@ public class MainFragment extends Fragment{
                 Uri uri = Uri.parse(BASE_URL).buildUpon()
                         .appendQueryParameter("api_key", API_KEY)
                         .appendQueryParameter(SORT_QUERY_PARAM, params[0])
+                        .appendQueryParameter("language","en")
                         .build();
                 URL url = new URL(uri.toString());
                 Log.i(LOG_TAG,url.toString());
@@ -143,10 +188,16 @@ public class MainFragment extends Fragment{
             List<MovieDataManager> results = new ArrayList<MovieDataManager>();
             JSONArray resultArr = (JSONArray)j.getJSONArray("results");
             for (int i = 0 ; i < resultArr.length() ; i++) {
-                JSONObject res = (JSONObject)resultArr.get(i);
-                //String title = (String) res.get("title");
-                MovieDataManager m = new MovieDataManager(res);
-                results.add(m);
+                try {
+                    JSONObject res = (JSONObject) resultArr.get(i);
+                    //String title = (String) res.get("title");
+                    MovieDataManager m = new MovieDataManager(res);
+                    results.add(m);
+                } catch (JSONException e) {
+                    Log.e(FetchTask.class.getSimpleName(),e.getMessage(), e);
+                } catch (Exception e) {
+                    Log.e(FetchTask.class.getSimpleName(),e.getMessage(), e);
+                }
             }
             return results;
         }
@@ -157,7 +208,7 @@ public class MainFragment extends Fragment{
 
             try {
                 imageWithTextAdapter.addAll(mgrs);
-                spinner = (ProgressBar) getActivity().findViewById(R.id.spinnerView);
+                //spinner = (ProgressBar) getActivity().findViewById(R.id.spinnerView);
                 spinner.setVisibility(View.GONE);
             } catch (Exception e){
                 Log.e("FetchData",e.getMessage(),e);

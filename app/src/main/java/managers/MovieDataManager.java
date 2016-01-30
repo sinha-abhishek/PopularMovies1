@@ -30,7 +30,8 @@ public class MovieDataManager implements Serializable {
         this.title = (String) movieObj.get("title");
         posterPath = (String) movieObj.get("poster_path");
         overView = (String) movieObj.get("overview");
-        voteAverage = (double) movieObj.get("vote_average");
+        //String vAvg = (String) movieObj.ge
+        voteAverage = movieObj.getDouble("vote_average");
         releaseDate = (String) movieObj.get("release_date");
 
     }
