@@ -25,6 +25,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import Adapters.ImageWithTextAdapter;
 import managers.MovieDataManager;
 
 /**
@@ -36,6 +37,7 @@ public class TestFragment extends Fragment{
     final String BASE_URL = "https://api.themoviedb.org/3/discover/movie?";
     final String API_KEY = "6fbc4c1792dbc14aba698926dfadf31f";
     final String SORT_QUERY_PARAM = "sort_by";
+    private ImageWithTextAdapter imageWithTextAdapter;
 
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -43,9 +45,12 @@ public class TestFragment extends Fragment{
         FetchTask t = new FetchTask();
         t.execute("popularity.desc");
         List<String> dummyList = new ArrayList<String>();
+        List<String> dummyList2 = new ArrayList<String>();
+
         adp = new ArrayAdapter<String>(getActivity(),R.layout.list_item,R.id.listitem, dummyList);
+        imageWithTextAdapter = new ImageWithTextAdapter(getActivity(),dummyList, dummyList2);
         GridView lv = (GridView) rootView;
-        lv.setAdapter(adp);
+        lv.setAdapter(imageWithTextAdapter);
         return rootView;
     }
 
@@ -67,7 +72,6 @@ public class TestFragment extends Fragment{
                 URL url = new URL(uri.toString());
                 Log.i(LOG_TAG,url.toString());
                 // new URL("https://api.themoviedb.org/3/discover/movie?api_key=6fbc4c1792dbc14aba698926dfadf31f&sort_by=popularity.desc");
-
                 // Create the request to OpenWeatherMap, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
@@ -137,13 +141,17 @@ public class TestFragment extends Fragment{
         @Override
         protected void onPostExecute(List<MovieDataManager> mgrs) {
             adp.clear();
+            imageWithTextAdapter.clear();
             List<String> strings = new ArrayList<String>();
+            List<String> posterPaths = new ArrayList<String>();
             try {
                 for (MovieDataManager m : mgrs) {
                     String title = m.GetTitle();
                     strings.add(title);
+                    String path = m.GetPosterPath();
+                    posterPaths.add(path);
                 }
-
+                imageWithTextAdapter.addAll(posterPaths,strings);
                 adp.addAll(strings);
                 spinner = (ProgressBar) getActivity().findViewById(R.id.spinnerView);
                 spinner.setVisibility(View.GONE);
