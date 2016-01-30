@@ -57,17 +57,34 @@ public class ImageWithTextAdapter extends BaseAdapter {
         return position;
     }
 
+    public class Holder
+    {
+        TextView tv;
+        ImageView img;
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View view;
-        view = inflater.inflate(R.layout.grid_item, null);
-        TextView textView = (TextView) view.findViewById(R.id.movieTitle);
-        ImageView imageView = (ImageView) view.findViewById(R.id.moviePoster);
+        //View view;
+
+
+        Holder holder;
+
+        if (convertView == null) {
+            convertView = inflater.inflate(R.layout.grid_item, null);
+            holder = new Holder();
+            holder.tv = (TextView) convertView.findViewById(R.id.movieTitle);
+            holder.img = (ImageView) convertView.findViewById(R.id.moviePoster);
+            convertView.setTag(holder);
+        } else {
+            holder = (Holder) convertView.getTag();
+        }
+
         MovieDataManager m = movieDetails.get(position);
-        textView.setText(m.GetTitle());
+        holder.tv.setText(m.GetTitle());
         String imgUrl = BASE_URL + "/" + m.GetPosterPath();
-        Picasso.with(context).load(imgUrl).into(imageView);
-        return  view;
+        Picasso.with(context).load(imgUrl).into(holder.img);
+        return  convertView;
 
     }
 }
