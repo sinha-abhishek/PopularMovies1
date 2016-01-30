@@ -1,6 +1,7 @@
 package com.example.abhisheksinha.listviewexample;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -8,9 +9,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,12 +33,12 @@ import managers.MovieDataManager;
 /**
  * Created by abhisheksinha on 12/31/15.
  */
-public class TestFragment extends Fragment{
-    private ArrayAdapter<String> adp;
+public class MainFragment extends Fragment{
     private ProgressBar spinner;
     final String BASE_URL = "https://api.themoviedb.org/3/discover/movie?";
-    final String API_KEY = "6fbc4c1792dbc14aba698926dfadf31f";
+    final String API_KEY = "xxxxxxx";
     final String SORT_QUERY_PARAM = "sort_by";
+    final String MOVIE_DATA = "movie_data";
     private ImageWithTextAdapter imageWithTextAdapter;
 
     @Override
@@ -44,13 +46,24 @@ public class TestFragment extends Fragment{
         View rootView = inflater.inflate(R.layout.fragment_example, container, false);
         FetchTask t = new FetchTask();
         t.execute("popularity.desc");
-        List<String> dummyList = new ArrayList<String>();
-        List<String> dummyList2 = new ArrayList<String>();
-
-        adp = new ArrayAdapter<String>(getActivity(),R.layout.list_item,R.id.listitem, dummyList);
-        imageWithTextAdapter = new ImageWithTextAdapter(getActivity(),dummyList, dummyList2);
+        List<MovieDataManager> dummyList = new ArrayList<MovieDataManager>();
+        imageWithTextAdapter = new ImageWithTextAdapter(getActivity(),dummyList);
         GridView lv = (GridView) rootView;
         lv.setAdapter(imageWithTextAdapter);
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                MovieDataManager m = (MovieDataManager) parent.getAdapter().getItem(position);
+                try {
+                    Intent movieDetailIntent = new Intent(getActivity(), DetailActivity.class)
+                            .putExtra(Intent.EXTRA_TEXT, m.GetJson());
+                    startActivity(movieDetailIntent);
+                } catch (JSONException e) {
+                    Log.e("MainFragment",e.getMessage(),e);
+                    Toast.makeText(getActivity(), "Can't load this time", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
         return rootView;
     }
 
@@ -140,23 +153,14 @@ public class TestFragment extends Fragment{
 
         @Override
         protected void onPostExecute(List<MovieDataManager> mgrs) {
-            adp.clear();
             imageWithTextAdapter.clear();
-            List<String> strings = new ArrayList<String>();
-            List<String> posterPaths = new ArrayList<String>();
+
             try {
-                for (MovieDataManager m : mgrs) {
-                    String title = m.GetTitle();
-                    strings.add(title);
-                    String path = m.GetPosterPath();
-                    posterPaths.add(path);
-                }
-                imageWithTextAdapter.addAll(posterPaths,strings);
-                adp.addAll(strings);
+                imageWithTextAdapter.addAll(mgrs);
                 spinner = (ProgressBar) getActivity().findViewById(R.id.spinnerView);
                 spinner.setVisibility(View.GONE);
-            } catch (JSONException e){
-                Log.e("FetchData","Jsonexception",e);
+            } catch (Exception e){
+                Log.e("FetchData",e.getMessage(),e);
             }
             //spinner.setVisibility(View.VISIBLE);
             super.onPostExecute(mgrs);

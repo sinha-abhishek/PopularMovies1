@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id = "@+id/fragId"
-        android:name = "com.example.abhisheksinha.listviewexample.TestFragment"
+        android:name = "com.example.abhisheksinha.listviewexample.MainFragment"
         />
     <ProgressBar xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/spinnerView"

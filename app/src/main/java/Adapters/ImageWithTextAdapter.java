@@ -13,18 +13,19 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import managers.MovieDataManager;
+
 /**
  * Created by abhisheksinha on 1/30/16.
  */
 public class ImageWithTextAdapter extends BaseAdapter {
-    private List<String> posterPaths;
-    private List<String> titles;
+
+    private List<MovieDataManager> movieDetails;
     Context context;
-    final String BASE_URL = "http://image.tmdb.org/t/p/w92";
+    final String BASE_URL = "http://image.tmdb.org/t/p/w185";
     private static LayoutInflater inflater=null;
-    public ImageWithTextAdapter(Context context, List<String> posterPaths, List<String> titles) {
-        this.posterPaths = posterPaths;
-        this.titles = titles;
+    public ImageWithTextAdapter(Context context, List<MovieDataManager> movieDetails) {
+        this.movieDetails = movieDetails;
         this.context = context;
         inflater = ( LayoutInflater )context.
                 getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -32,25 +33,23 @@ public class ImageWithTextAdapter extends BaseAdapter {
     }
 
     public void clear() {
-        posterPaths.clear();
-        titles.clear();
+        movieDetails.clear();
         this.notifyDataSetChanged();
     }
 
-    public void addAll(List<String> posterPaths, List<String> titles) {
-        this.posterPaths = posterPaths;
-        this.titles = titles;
+    public void addAll(List<MovieDataManager> movieDetails) {
+        this.movieDetails = movieDetails;
         this.notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return titles.size();
+        return movieDetails.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return position;
+        return movieDetails.get(position);
     }
 
     @Override
@@ -64,8 +63,9 @@ public class ImageWithTextAdapter extends BaseAdapter {
         view = inflater.inflate(R.layout.grid_item, null);
         TextView textView = (TextView) view.findViewById(R.id.movieTitle);
         ImageView imageView = (ImageView) view.findViewById(R.id.moviePoster);
-        textView.setText(titles.get(position));
-        String imgUrl = BASE_URL + "/" + posterPaths.get(position);
+        MovieDataManager m = movieDetails.get(position);
+        textView.setText(m.GetTitle());
+        String imgUrl = BASE_URL + "/" + m.GetPosterPath();
         Picasso.with(context).load(imgUrl).into(imageView);
         return  view;
 
