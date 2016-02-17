@@ -3,6 +3,7 @@ package com.example.abhisheksinha.listviewexample;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Movie;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -65,11 +66,11 @@ public class MainFragment extends Fragment{
         super.onStart();
         spinner = (ProgressBar) getActivity().findViewById(R.id.spinnerView);
         spinner.setVisibility(View.VISIBLE);
-        FetchTask t = new FetchTask();
+        //FetchTask t = new FetchTask();
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String syncConnPref = sharedPref.getString(SettingsActivity.SORT_PREF_KEY, "");
         Log.i(MainFragment.class.getSimpleName(), syncConnPref);
-        t.execute(syncConnPref);
+        //t.execute(syncConnPref);
 
         RestClient c = new RestClient();
         ApiService apiService = c.getApiService();
@@ -77,8 +78,10 @@ public class MainFragment extends Fragment{
             @Override
             public void success(DiscoverResponseModel dataModels, Response response) {
                 List<MovieDataModel> movieDataModels = dataModels.getMovieDataModels();
+                spinner.setVisibility(View.GONE);
+                imageWithTextAdapter.addAll(movieDataModels);
                 for (MovieDataModel m:movieDataModels) {
-                    Log.i("RETRO",m.GetTitle());
+                    Log.i("RETRO",m.GetTitle()+" "+m.GetVoteAvg());
                 }
             }
 
@@ -100,19 +103,20 @@ public class MainFragment extends Fragment{
 //        String syncConnPref = sharedPref.getString(SettingsActivity.SORT_PREF_KEY, "");
 //        Log.i(MainFragment.class.getSimpleName(), syncConnPref);
 //        t.execute("popularity.desc");
-        List<MovieDataManager> dummyList = new ArrayList<MovieDataManager>();
+        List<MovieDataModel> dummyList = new ArrayList<MovieDataModel>();
         imageWithTextAdapter = new ImageWithTextAdapter(getActivity(),dummyList);
         GridView lv = (GridView) rootView;
         lv.setAdapter(imageWithTextAdapter);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                MovieDataManager m = (MovieDataManager) parent.getAdapter().getItem(position);
+                MovieDataModel m = (MovieDataModel) parent.getAdapter().getItem(position);
                 try {
                     Intent movieDetailIntent = new Intent(getActivity(), DetailActivity.class)
-                            .putExtra(Intent.EXTRA_TEXT, m.GetJson());
+                            .putExtra(Intent.EXTRA_TEXT, m);
+                           // .putExtra(Intent.EXTRA_TEXT, m.GetJson());
                     startActivity(movieDetailIntent);
-                } catch (JSONException e) {
+                } catch (Exception e) {
                     Log.e("MainFragment",e.getMessage(),e);
                     Toast.makeText(getActivity(), "Can't load this time", Toast.LENGTH_SHORT).show();
                 }
@@ -233,7 +237,7 @@ public class MainFragment extends Fragment{
             imageWithTextAdapter.clear();
 
             try {
-                imageWithTextAdapter.addAll(mgrs);
+                //imageWithTextAdapter.addAll(mgrs);
                 //spinner = (ProgressBar) getActivity().findViewById(R.id.spinnerView);
                 spinner.setVisibility(View.GONE);
             } catch (Exception e){

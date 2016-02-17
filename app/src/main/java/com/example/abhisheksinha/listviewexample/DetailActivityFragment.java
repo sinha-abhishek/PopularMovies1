@@ -20,6 +20,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import managers.MovieDataManager;
+import models.MovieDataModel;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -48,9 +49,10 @@ public class DetailActivityFragment extends Fragment {
         Intent intent = getActivity().getIntent();
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
             try {
-                String data = intent.getStringExtra(Intent.EXTRA_TEXT);
-                JSONObject j = new JSONObject(data);
-                MovieDataManager m = new MovieDataManager(j);
+//                String data = intent.getStringExtra(Intent.EXTRA_TEXT);
+//                JSONObject j = new JSONObject(data);
+//                MovieDataManager m = new MovieDataManager(j);
+                MovieDataModel m = intent.getParcelableExtra(Intent.EXTRA_TEXT);
                 TextView title = (TextView) view.findViewById(R.id.detailTitle);
                 title.setText(m.GetTitle());
                 ImageView img = (ImageView) view.findViewById(R.id.detailImage);
@@ -64,7 +66,7 @@ public class DetailActivityFragment extends Fragment {
                 voteAvg.setText(Double.toString(m.GetVoteAvg()));
                 TextView releaseDateVal = (TextView) view.findViewById(R.id.releaseDateVal);
                 releaseDateVal.setText(m.GetReleaseDate());
-            }catch (JSONException e) {
+            }catch (Exception e) {
                 Log.e(DetailActivityFragment.class.getSimpleName(),e.getMessage(),e);
             }
         }

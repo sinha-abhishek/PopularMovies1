@@ -14,17 +14,18 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 import managers.MovieDataManager;
+import models.MovieDataModel;
 
 /**
  * Created by abhisheksinha on 1/30/16.
  */
 public class ImageWithTextAdapter extends BaseAdapter {
 
-    private List<MovieDataManager> movieDetails;
+    private List<MovieDataModel> movieDetails;
     Context context;
     final String BASE_URL = "http://image.tmdb.org/t/p/w185";
     private static LayoutInflater inflater=null;
-    public ImageWithTextAdapter(Context context, List<MovieDataManager> movieDetails) {
+    public ImageWithTextAdapter(Context context, List<MovieDataModel> movieDetails) {
         this.movieDetails = movieDetails;
         this.context = context;
         inflater = ( LayoutInflater )context.
@@ -37,7 +38,7 @@ public class ImageWithTextAdapter extends BaseAdapter {
         this.notifyDataSetChanged();
     }
 
-    public void addAll(List<MovieDataManager> movieDetails) {
+    public void addAll(List<MovieDataModel> movieDetails) {
         this.movieDetails = movieDetails;
         this.notifyDataSetChanged();
     }
@@ -80,7 +81,7 @@ public class ImageWithTextAdapter extends BaseAdapter {
             holder = (Holder) convertView.getTag();
         }
 
-        MovieDataManager m = movieDetails.get(position);
+        MovieDataModel m = movieDetails.get(position);
         holder.tv.setText(m.GetTitle());
         String imgUrl = BASE_URL + "/" + m.GetPosterPath();
         Picasso.with(context).load(imgUrl).into(holder.img);
