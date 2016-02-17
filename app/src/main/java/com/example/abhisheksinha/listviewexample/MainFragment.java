@@ -66,12 +66,9 @@ public class MainFragment extends Fragment{
         super.onStart();
         spinner = (ProgressBar) getActivity().findViewById(R.id.spinnerView);
         spinner.setVisibility(View.VISIBLE);
-        //FetchTask t = new FetchTask();
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String syncConnPref = sharedPref.getString(SettingsActivity.SORT_PREF_KEY, "");
         Log.i(MainFragment.class.getSimpleName(), syncConnPref);
-        //t.execute(syncConnPref);
-
         RestClient c = new RestClient();
         ApiService apiService = c.getApiService();
         apiService.getMovies(API_KEY, syncConnPref, new Callback<DiscoverResponseModel>() {
@@ -98,11 +95,6 @@ public class MainFragment extends Fragment{
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_example, container, false);
 
-//        FetchTask t = new FetchTask();
-//        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-//        String syncConnPref = sharedPref.getString(SettingsActivity.SORT_PREF_KEY, "");
-//        Log.i(MainFragment.class.getSimpleName(), syncConnPref);
-//        t.execute("popularity.desc");
         List<MovieDataModel> dummyList = new ArrayList<MovieDataModel>();
         imageWithTextAdapter = new ImageWithTextAdapter(getActivity(),dummyList);
         GridView lv = (GridView) rootView;
@@ -141,110 +133,4 @@ public class MainFragment extends Fragment{
         return true;
     }
 
-    public class FetchTask extends AsyncTask<String, Void, List<MovieDataManager>> {
-        @Override
-        protected List<MovieDataManager> doInBackground(String... params) {
-            HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
-            String LOG_TAG = FetchTask.class.getSimpleName();
-
-            // Will contain the raw JSON response as a string.
-            String forecastJsonStr = null;
-
-            try {
-                Uri uri = Uri.parse(BASE_URL).buildUpon()
-                        .appendQueryParameter("api_key", API_KEY)
-                        .appendQueryParameter(SORT_QUERY_PARAM, params[0])
-                        .appendQueryParameter("language","en")
-                        .build();
-                URL url = new URL(uri.toString());
-                Log.i(LOG_TAG,url.toString());
-                // new URL("https://api.themoviedb.org/3/discover/movie?api_key=6fbc4c1792dbc14aba698926dfadf31f&sort_by=popularity.desc");
-                // Create the request to OpenWeatherMap, and open the connection
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                // Read the input stream into a String
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-                if (inputStream == null) {
-                    // Nothing to do.
-                    return null;
-                }
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                    // But it does make debugging a *lot* easier if you print out the completed
-                    // buffer for debugging.
-                    buffer.append(line + "\n");
-                }
-
-                if (buffer.length() == 0) {
-                    // Stream was empty.  No point in parsing.
-                    return null;
-                }
-                forecastJsonStr = buffer.toString();
-                Log.i("FetchTask", forecastJsonStr);
-                List<MovieDataManager> results = parseJson(forecastJsonStr);
-                //Log.i("FetchTask", results.get(0));
-                return results;
-                //Log.e("FetchTask", "Info: ", );
-            } catch (IOException e) {
-                Log.e("PlaceholderFragment", "Error ", e);
-                // If the code didn't successfully get the weather data, there's no point in attemping
-                // to parse it.
-                return null;
-            } catch (JSONException e) {
-                Log.e("PlaceholderFragment", "Error ", e);
-            } finally{
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e("PlaceholderFragment", "Error closing stream", e);
-                    }
-                }
-            }
-            return null;
-        }
-        private List<MovieDataManager> parseJson(String jData) throws JSONException{
-            JSONObject j = new JSONObject(jData);
-            List<MovieDataManager> results = new ArrayList<MovieDataManager>();
-            JSONArray resultArr = (JSONArray)j.getJSONArray("results");
-            for (int i = 0 ; i < resultArr.length() ; i++) {
-                try {
-                    JSONObject res = (JSONObject) resultArr.get(i);
-                    //String title = (String) res.get("title");
-                    MovieDataManager m = new MovieDataManager(res);
-                    results.add(m);
-                } catch (JSONException e) {
-                    Log.e(FetchTask.class.getSimpleName(),e.getMessage(), e);
-                } catch (Exception e) {
-                    Log.e(FetchTask.class.getSimpleName(),e.getMessage(), e);
-                }
-            }
-            return results;
-        }
-
-        @Override
-        protected void onPostExecute(List<MovieDataManager> mgrs) {
-            imageWithTextAdapter.clear();
-
-            try {
-                //imageWithTextAdapter.addAll(mgrs);
-                //spinner = (ProgressBar) getActivity().findViewById(R.id.spinnerView);
-                spinner.setVisibility(View.GONE);
-            } catch (Exception e){
-                Log.e("FetchData",e.getMessage(),e);
-            }
-            //spinner.setVisibility(View.VISIBLE);
-            super.onPostExecute(mgrs);
-        }
-    }
 }
