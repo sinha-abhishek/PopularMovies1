@@ -34,6 +34,13 @@ import java.util.List;
 
 import Adapters.ImageWithTextAdapter;
 import managers.MovieDataManager;
+import models.DiscoverResponseModel;
+import models.MovieDataModel;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+import services.ApiService;
+import services.RestClient;
 
 /**
  * Created by abhisheksinha on 12/31/15.
@@ -63,7 +70,26 @@ public class MainFragment extends Fragment{
         String syncConnPref = sharedPref.getString(SettingsActivity.SORT_PREF_KEY, "");
         Log.i(MainFragment.class.getSimpleName(), syncConnPref);
         t.execute(syncConnPref);
+
+        RestClient c = new RestClient();
+        ApiService apiService = c.getApiService();
+        apiService.getMovies(API_KEY, syncConnPref, new Callback<DiscoverResponseModel>() {
+            @Override
+            public void success(DiscoverResponseModel dataModels, Response response) {
+                List<MovieDataModel> movieDataModels = dataModels.getMovieDataModels();
+                for (MovieDataModel m:movieDataModels) {
+                    Log.i("RETRO",m.GetTitle());
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.e("RETRO", error.toString());
+            }
+        });
     }
+
+
 
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
