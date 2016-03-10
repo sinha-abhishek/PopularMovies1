@@ -7,6 +7,7 @@ import android.graphics.Movie;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,6 +32,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import Adapters.ImageWithTextAdapter;
@@ -53,40 +55,136 @@ public class MainFragment extends Fragment{
     final String SORT_QUERY_PARAM = "sort_by";
     final String MOVIE_DATA = "movie_data";
     private ImageWithTextAdapter imageWithTextAdapter;
+    private ArrayList<MovieDataModel> movieDataModelList;
+    private String sortPreference;
+   // private HashMap<S>
+    final String MOVIE_LIST_DATA = "movie_list_data";
+    private boolean showSpinner;
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String syncConnPref = sharedPref.getString(SettingsActivity.SORT_PREF_KEY, "");
+        outState.putString(SettingsActivity.SORT_PREF_KEY, syncConnPref);
+        outState.putParcelableArrayList(MOVIE_LIST_DATA, movieDataModelList);
+        super.onSaveInstanceState(outState);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         PreferenceManager.setDefaultValues(getActivity(), R.xml.pref_final, false);
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String syncConnPref = sharedPref.getString(SettingsActivity.SORT_PREF_KEY, "");
+        sortPreference = syncConnPref;
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null && savedInstanceState.containsKey(MOVIE_LIST_DATA) &&
+                savedInstanceState.containsKey(SettingsActivity.SORT_PREF_KEY) &&
+                sortPreference == savedInstanceState.getString(SettingsActivity.SORT_PREF_KEY)) {
+            showSpinner = false;
+            movieDataModelList = savedInstanceState.getParcelableArrayList(MOVIE_LIST_DATA);
+        } else {
+            showSpinner = true;
+            movieDataModelList = new ArrayList<MovieDataModel>();
+
+
+            Log.i(MainFragment.class.getSimpleName(), syncConnPref);
+            RestClient c = new RestClient();
+            ApiService apiService = c.getApiService();
+            apiService.getMovies(API_KEY, syncConnPref, new Callback<DiscoverResponseModel>() {
+                @Override
+                public void success(DiscoverResponseModel dataModels, Response response) {
+                    ArrayList<MovieDataModel> movieDataModels = dataModels.getMovieDataModels();
+                    spinner.setVisibility(View.GONE);
+                    movieDataModelList = movieDataModels;
+                    imageWithTextAdapter.addAll(movieDataModels);
+                    showSpinner = false;
+                    if (spinner != null) {
+                        spinner.setVisibility(View.GONE);
+                    }
+                    removeSpinner();
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    Log.e("RETRO", error.toString());
+                }
+            });
+        }
+
+    }
+
+    public void removeSpinner(){
+        if (spinner != null) {
+            spinner.setVisibility(View.GONE);
+        } else {
+            spinner = (ProgressBar) getActivity().findViewById(R.id.spinnerView);
+            spinner.setVisibility(View.GONE);
+        }
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        spinner = (ProgressBar) getActivity().findViewById(R.id.spinnerView);
-        spinner.setVisibility(View.VISIBLE);
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String syncConnPref = sharedPref.getString(SettingsActivity.SORT_PREF_KEY, "");
-        Log.i(MainFragment.class.getSimpleName(), syncConnPref);
-        RestClient c = new RestClient();
-        ApiService apiService = c.getApiService();
-        apiService.getMovies(API_KEY, syncConnPref, new Callback<DiscoverResponseModel>() {
-            @Override
-            public void success(DiscoverResponseModel dataModels, Response response) {
-                List<MovieDataModel> movieDataModels = dataModels.getMovieDataModels();
-                spinner.setVisibility(View.GONE);
-                imageWithTextAdapter.addAll(movieDataModels);
-                for (MovieDataModel m:movieDataModels) {
-                    Log.i("RETRO",m.GetTitle()+" "+m.GetVoteAvg());
+        if (movieDataModelList.size() == 0 || syncConnPref != sortPreference) {
+            sortPreference = syncConnPref;
+            spinner = (ProgressBar) getActivity().findViewById(R.id.spinnerView);
+            spinner.setVisibility(View.VISIBLE);
+            imageWithTextAdapter.clear();
+            Log.i(MainFragment.class.getSimpleName(), syncConnPref);
+            RestClient c = new RestClient();
+            ApiService apiService = c.getApiService();
+            apiService.getMovies(API_KEY, syncConnPref, new Callback<DiscoverResponseModel>() {
+                @Override
+                public void success(DiscoverResponseModel dataModels, Response response) {
+                    ArrayList<MovieDataModel> movieDataModels = dataModels.getMovieDataModels();
+                    spinner.setVisibility(View.GONE);
+                    imageWithTextAdapter.addAll(movieDataModels);
+                    movieDataModelList = movieDataModels;
                 }
-            }
 
-            @Override
-            public void failure(RetrofitError error) {
-                Log.e("RETRO", error.toString());
-            }
-        });
+                @Override
+                public void failure(RetrofitError error) {
+                    Log.e("RETRO", error.toString());
+                }
+            });
+        } else {
+            spinner = (ProgressBar) getActivity().findViewById(R.id.spinnerView);
+            spinner.setVisibility(View.GONE);
+            imageWithTextAdapter.addAll(movieDataModelList);
+        }
+//        if (showSpinner) {
+//            spinner = (ProgressBar) getActivity().findViewById(R.id.spinnerView);
+//            spinner.setVisibility(View.VISIBLE);
+//        } else {
+//            spinner = (ProgressBar) getActivity().findViewById(R.id.spinnerView);
+//            spinner.setVisibility(View.GONE);
+//        }
+//        spinner = (ProgressBar) getActivity().findViewById(R.id.spinnerView);
+//        spinner.setVisibility(View.VISIBLE);
+//        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+//        String syncConnPref = sharedPref.getString(SettingsActivity.SORT_PREF_KEY, "");
+//        Log.i(MainFragment.class.getSimpleName(), syncConnPref);
+//        RestClient c = new RestClient();
+//        ApiService apiService = c.getApiService();
+//        apiService.getMovies(API_KEY, syncConnPref, new Callback<DiscoverResponseModel>() {
+//            @Override
+//            public void success(DiscoverResponseModel dataModels, Response response) {
+//                List<MovieDataModel> movieDataModels = dataModels.getMovieDataModels();
+//                spinner.setVisibility(View.GONE);
+//                imageWithTextAdapter.addAll(movieDataModels);
+//                for (MovieDataModel m:movieDataModels) {
+//                    Log.i("RETRO",m.GetTitle()+" "+m.GetVoteAvg());
+//                }
+//            }
+//
+//            @Override
+//            public void failure(RetrofitError error) {
+//                Log.e("RETRO", error.toString());
+//            }
+//        });
     }
 
 
@@ -94,9 +192,7 @@ public class MainFragment extends Fragment{
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_example, container, false);
-
-        List<MovieDataModel> dummyList = new ArrayList<MovieDataModel>();
-        imageWithTextAdapter = new ImageWithTextAdapter(getActivity(),dummyList);
+        imageWithTextAdapter = new ImageWithTextAdapter(getActivity(),movieDataModelList);
         GridView lv = (GridView) rootView;
         lv.setAdapter(imageWithTextAdapter);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {

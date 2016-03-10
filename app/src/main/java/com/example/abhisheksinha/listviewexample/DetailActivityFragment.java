@@ -66,6 +66,14 @@ public class DetailActivityFragment extends Fragment {
                 voteAvg.setText(Double.toString(m.GetVoteAvg()));
                 TextView releaseDateVal = (TextView) view.findViewById(R.id.releaseDateVal);
                 releaseDateVal.setText(m.GetReleaseDate());
+
+                TextView trailer = (TextView) view.findViewById(R.id.trailer);
+                trailer.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                });
             }catch (Exception e) {
                 Log.e(DetailActivityFragment.class.getSimpleName(),e.getMessage(),e);
             }
