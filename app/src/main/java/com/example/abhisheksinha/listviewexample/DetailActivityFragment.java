@@ -67,13 +67,13 @@ public class DetailActivityFragment extends Fragment {
                 TextView releaseDateVal = (TextView) view.findViewById(R.id.releaseDateVal);
                 releaseDateVal.setText(m.GetReleaseDate());
 
-                TextView trailer = (TextView) view.findViewById(R.id.trailer);
-                trailer.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                    }
-                });
+//                TextView trailer = (TextView) view.findViewById(R.id.trailers);
+//                trailer.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//
+//                    }
+//                });
             }catch (Exception e) {
                 Log.e(DetailActivityFragment.class.getSimpleName(),e.getMessage(),e);
             }

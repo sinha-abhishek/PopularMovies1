@@ -19,6 +19,7 @@ android {
     }
     repositories {
         mavenCentral()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
 }
 
@@ -30,5 +31,7 @@ dependencies {
     compile 'com.android.support:support-v4:21.0.3'
     compile 'com.squareup.retrofit:retrofit:1.6.1'
     compile 'com.google.code.gson:gson:2.3'
-    compile 'org.parceler:parceler:0.2.13'
+    compile 'org.parceler:parceler-api:1.0.0'
+    provided 'org.parceler:parceler:1.0.0'
+    compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
 }

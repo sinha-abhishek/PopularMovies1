@@ -22,12 +22,25 @@ public class MovieDataModel implements Parcelable{
 
     @Override
     public void writeToParcel(android.os.Parcel dest, int flags) {
+        dest.writeDouble(id);
         dest.writeString(title);
         dest.writeString(overView);
         dest.writeString(releaseDate);
         dest.writeDouble(voteAverage);
         dest.writeString(posterPath);
     }
+
+    public MovieDataModel(MovieDBModel model) {
+        this.id = model.id;
+        this.title = model.name;
+        this.overView = model.overview;
+        this.releaseDate = model.releaseDate;
+        this.voteAverage = model.voteAverage;
+        this.posterPath = model.posterPath;
+    }
+
+    @SerializedName("id")
+    private double id;
 
     @SerializedName("title")
     private String title;
@@ -49,6 +62,7 @@ public class MovieDataModel implements Parcelable{
     @SerializedName("vote_average")
     private double voteAverage;
 
+    public double GetId() { return id;}
     public String GetTitle() {
         return title;
     }
@@ -71,6 +85,7 @@ public class MovieDataModel implements Parcelable{
     }
 
     private MovieDataModel(android.os.Parcel in) {
+        this.id = in.readDouble();
         this.title = in.readString();
         this.overView = in.readString();
         this.releaseDate = in.readString();
