@@ -3,9 +3,11 @@
     <string-array name="sortPreferences">
         <item>@string/sort_popularity</item>
         <item>@string/sort_vote</item>
+        <item>@string/favrts</item>
     </string-array>
     <string-array name="sortPreferenceValues">
         <item>popularity.desc</item>
         <item>vote_average.desc</item>
+        <item>@string/favrts_val</item>
     </string-array>
 </resources>

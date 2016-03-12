@@ -1,5 +1,10 @@
 package models;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.database.MatrixCursor;
+import android.provider.BaseColumns;
+
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
@@ -13,8 +18,9 @@ import java.util.List;
  * Created by abhishek on 10/03/16.
  */
 
+@Table(name="MovieDBModel" , id = BaseColumns._ID)
 public class MovieDBModel extends Model {
-    @Column(name = "movieId" , unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    @Column(name = "id" , unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     public double id;
 
    @Column(name = "name" )
@@ -118,7 +124,7 @@ public class MovieDBModel extends Model {
 
     public static MovieDBModel FetchModelById(double id){
         Select select = new Select();
-        MovieDBModel model = select.from(MovieDBModel.class).where("movieId = ?",id).executeSingle();
+        MovieDBModel model = select.from(MovieDBModel.class).where("id = ?",id).executeSingle();
         return model;
     }
 
@@ -170,10 +176,59 @@ public class MovieDBModel extends Model {
 
     }
 
-    public static List<MovieDBModel> FetchModels(boolean popular, boolean highrated, boolean fav) {
+    public static List<MovieDBModel> FetchModels(String popular, String highrated, String fav) {
         Select select = new Select();
         List<MovieDBModel> models = select.from(MovieDBModel.class).where("isHighRated = ? AND isPopular= ? " +
                 "AND isFav=?", highrated,popular,fav).execute();
         return models;
+    }
+
+    public static List<MovieDBModel> Fetch(String colName) {
+        Select select = new Select();
+        List<MovieDBModel> models = select.from(MovieDBModel.class).where(colName+" = ? "
+                , true).execute();
+        return models;
+    }
+
+
+
+
+    public static MovieDBModel fromCursor(Cursor cursor) {
+        MovieDBModel m = new MovieDBModel();
+        m.loadFromCursor(cursor);
+        return m;
+    }
+
+    public static Cursor ToCursor(List<MovieDBModel> movieDbModels) {
+        String[] columns = new String[]{"_id", "id",  "name", "overview", "releaseDate", "voteAverage", "posterPath", "isFav"};
+        MatrixCursor cursor = new MatrixCursor(columns);
+
+
+        for (MovieDBModel movieDbModel:
+             movieDbModels) {
+            cursor.addRow( new Object[] {movieDbModel.getId(), movieDbModel.id, movieDbModel.name,
+                    movieDbModel.overview, movieDbModel.releaseDate,
+                    movieDbModel.voteAverage, movieDbModel.posterPath, movieDbModel.isFav});
+        }
+        return cursor;
+    }
+
+    public static List<MovieDBModel> GetAll(){
+        Select select = new Select();
+        List<MovieDBModel> models = select.from(MovieDBModel.class).execute();
+        return models;
+    }
+
+    public static Cursor MovieToCursor(List<MovieDataModel> models){
+
+        List<MovieDBModel> dbModels = new ArrayList<MovieDBModel>();
+        for (MovieDataModel model:
+                models) {
+            MovieDBModel dbModel = MovieDBModel.FetchModelById(model.GetId());
+            dbModels.add(dbModel);
+        }
+
+        Cursor cursor= MovieDBModel.ToCursor(dbModels);
+        return cursor;
     }
 }

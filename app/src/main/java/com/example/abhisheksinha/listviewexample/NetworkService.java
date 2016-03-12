@@ -22,6 +22,9 @@ import services.RestClient;
  */
 public class NetworkService extends Service {
     private static final String LOG_TAG = "NetworkService";
+    public static final String NETWORK_ACTION = "network_action";
+    public static final String POPULAR_UPDATED = "popular_updated";
+    public static final String RATED_UPDATED = "rated_updated";
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -35,9 +38,28 @@ public class NetworkService extends Service {
         apiService.getMovies(MainFragment.API_KEY, getString(R.string.sort_popularity_val), new Callback<DiscoverResponseModel>() {
             @Override
             public void success(DiscoverResponseModel discoverResponseModel, Response response) {
-                Log.i(LOG_TAG, "got "+discoverResponseModel.toString());
+                Log.i(LOG_TAG, "got " + discoverResponseModel.toString());
                 List<MovieDataModel> models = discoverResponseModel.getMovieDataModels();
                 MovieDBModel.UpdatePopular(models);
+                Intent intent1 = new Intent(NETWORK_ACTION);
+                intent1.putExtra(POPULAR_UPDATED, true);
+                sendBroadcast(intent1);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+
+            }
+        });
+        apiService.getMovies(MainFragment.API_KEY, getString(R.string.sort_vote_val), new Callback<DiscoverResponseModel>() {
+            @Override
+            public void success(DiscoverResponseModel discoverResponseModel, Response response) {
+                Log.i(LOG_TAG, "got "+discoverResponseModel.toString());
+                List<MovieDataModel> models = discoverResponseModel.getMovieDataModels();
+                MovieDBModel.UpdateRated(models);
+                Intent intent1 = new Intent(NETWORK_ACTION);
+                intent1.putExtra(RATED_UPDATED, true);
+                sendBroadcast(intent1);
             }
 
             @Override

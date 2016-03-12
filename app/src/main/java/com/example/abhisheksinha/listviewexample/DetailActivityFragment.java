@@ -11,7 +11,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -20,12 +22,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import managers.MovieDataManager;
+import models.MovieDBModel;
 import models.MovieDataModel;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class DetailActivityFragment extends Fragment {
+
 
     public DetailActivityFragment() {
     }
@@ -52,7 +56,7 @@ public class DetailActivityFragment extends Fragment {
 //                String data = intent.getStringExtra(Intent.EXTRA_TEXT);
 //                JSONObject j = new JSONObject(data);
 //                MovieDataManager m = new MovieDataManager(j);
-                MovieDataModel m = intent.getParcelableExtra(Intent.EXTRA_TEXT);
+                final MovieDataModel m = intent.getParcelableExtra(Intent.EXTRA_TEXT);
                 TextView title = (TextView) view.findViewById(R.id.detailTitle);
                 title.setText(m.GetTitle());
                 ImageView img = (ImageView) view.findViewById(R.id.detailImage);
@@ -66,6 +70,34 @@ public class DetailActivityFragment extends Fragment {
                 voteAvg.setText(Double.toString(m.GetVoteAvg()));
                 TextView releaseDateVal = (TextView) view.findViewById(R.id.releaseDateVal);
                 releaseDateVal.setText(m.GetReleaseDate());
+                Button button = (Button) view.findViewById(R.id.favBtn);
+                MovieDBModel movieDBModel = MovieDBModel.FetchModelById(m.GetId());
+
+                final boolean isFav = movieDBModel.isFav;
+                if (isFav){
+                    button.setText(getString(R.string.remFav));
+                } else{
+                    button.setText(getString(R.string.addfav));
+                }
+
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        MovieDBModel movieDBModel = MovieDBModel.FetchModelById(m.GetId());
+                        if(isFav){
+                            movieDBModel.isFav = false;
+                        } else {
+                            movieDBModel.isFav = true;
+                        }
+                        movieDBModel.save();
+                    }
+                });
+
+                ListView trailerList = (ListView) view.findViewById(R.id.trailers);
+
+                ListView reviewList = (ListView) view.findViewById(R.id.reviews);
+
+
 
 //                TextView trailer = (TextView) view.findViewById(R.id.trailers);
 //                trailer.setOnClickListener(new View.OnClickListener() {

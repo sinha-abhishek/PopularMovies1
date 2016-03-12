@@ -67,7 +67,12 @@
     <string name="pref_header_sort">Set sorting preference</string>
     <string name="sort_popularity">Sort by popularity</string>
     <string name="sort_vote">Sort by rating</string>
+    <string name="favrts">Show favourites</string>
     <string name="sort_popularity_val">popularity.desc</string>
     <string name="sort_vote_val">vote_average.desc</string>
+    <string name="favrts_val">fav</string>
     <string name="user_pref">Preferences</string>
+    <string name="addfav">Add to favorite</string>
+    <string name="remFav">Remove from favorite</string>
+    <string name="refresh">Refresh</string>
 </resources>
