@@ -10,7 +10,7 @@ import retrofit.converter.GsonConverter;
  * Created by abhishek on 17/02/16.
  */
 public class RestClient {
-    private static final String BASE_URL = "https://api.themoviedb.org/";
+    private static final String BASE_URL = "https://api.themoviedb.org/3/";
     private ApiService apiService;
 
     public RestClient(){

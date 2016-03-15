@@ -18,7 +18,7 @@ import java.util.List;
  * Created by abhishek on 17/02/16.
  */
 public interface ApiService {
-    @GET("/3/discover/movie")
+    @GET("/discover/movie")
     public void getMovies(@Query("api_key") String apiKey, @Query("sort_by") String sortString, Callback<DiscoverResponseModel> callback);
 
     @GET("/movie/{id}/videos")

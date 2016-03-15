@@ -3,6 +3,7 @@ package models;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by abhishek on 05/03/16.
@@ -12,5 +13,5 @@ public class VideoResponseModel {
     String id;
 
     @SerializedName("results")
-    public ArrayList<VideoModel> results;
+    public List<VideoModel> results;
 }

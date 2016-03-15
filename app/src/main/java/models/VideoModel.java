@@ -16,4 +16,12 @@ public class VideoModel {
     public String site;
     @SerializedName("key")
     public String key;
+
+    public String getYoutubeURL() {
+        String url = "";
+        if (site.compareToIgnoreCase("youtube") == 0) {
+            url = "https://www.youtube.com/watch?v="+key;
+        }
+        return url;
+    }
 }

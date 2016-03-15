@@ -28,14 +28,20 @@
 
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
         android:gravity="start"
         android:id = "@+id/detailImage"
         android:padding="0dp"
         android:contentDescription="@string/fetching"
 
         />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="20dp"
+        android:layout_weight="0.5">
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -44,11 +50,82 @@
             android:singleLine="false"
             android:gravity="center_vertical|center_horizontal"
             android:padding="5dp"
-            android:layout_gravity="center"
+            android:layout_gravity="top"
+            android:layout_margin="20dp"
             style="@style/Base.TextAppearance.AppCompat.Button"
             android:text="Add to favourites"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/user_rating_val"
+            android:text="this is test"
+            android:gravity="start"
+            android:padding="10dp"
+            style="@style/Base.TextAppearance.AppCompat.Small"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/releaseDateVal"
+            android:padding="10dp"
+            android:gravity="left"
+            android:text="this is test date"
+            style="@style/Base.TextAppearance.AppCompat.Small"
+            />
+    </LinearLayout>
+
         </LinearLayout>
-    <TextView
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@id/linearLayout">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/linearLayout"
+                android:id="@+id/synopsis"
+                android:gravity="start"
+                android:padding="10dp"
+                style ="@style/Base.TextAppearance.AppCompat.Body1"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:text="@string/title_trailers"
+                android:padding="5dp"
+                style="@style/Base.TextAppearance.AppCompat.Large"
+                />
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/trailers"
+                android:background="@color/background_material_light"
+                android:layout_margin="5dp"
+                >
+            </ListView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/review_title"
+                android:gravity="left"
+                android:text="@string/title_reviews"
+                android:padding="10dp"
+                style="@style/Base.TextAppearance.AppCompat.Large"
+                />
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/reviews"
+                android:background="@color/background_material_light"
+                android:layout_margin="5dp">
+
+            </ListView>
+
+        </LinearLayout>
+    <!--<TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/linearLayout"
@@ -56,79 +133,9 @@
         android:gravity="start"
         android:padding="10dp"
         style ="@style/Base.TextAppearance.AppCompat.Body1"
-        />
+        /> -->
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/synopsis"
-        android:id="@+id/user_rating_title"
-        android:padding="10dp"
-        android:gravity="start"
-        android:text="@string/user_rating"
-        style="@style/Base.TextAppearance.AppCompat.Large"
-        />
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/synopsis"
-        android:layout_toRightOf="@id/user_rating_title"
-        android:layout_toEndOf="@id/user_rating_title"
-        android:id="@+id/user_rating_val"
-        android:gravity="start"
-        android:padding="10dp"
-        style="@style/Base.TextAppearance.AppCompat.Large"
-        />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/user_rating_title"
-        android:id="@+id/releaseDate"
-        android:gravity="left"
-        android:text="@string/release_date"
-        android:padding="10dp"
-        style="@style/Base.TextAppearance.AppCompat.Large"
-        />
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/user_rating_title"
-        android:layout_toRightOf="@id/releaseDate"
-        android:layout_toEndOf="@id/releaseDate"
-        android:id="@+id/releaseDateVal"
-        android:padding="10dp"
-        android:gravity="left"
-        style="@style/Base.TextAppearance.AppCompat.Large"
-        />
-        <!--<TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/releaseDate"
-            android:id="@+id/trailer"
-            android:padding="10dp"
-            android:gravity="left"
-            style="@style/Base.TextAppearance.AppCompat.Large"
-            />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/trailer"
-            android:id="@+id/review_id"
-            android:padding="10dp"
-            android:gravity="left"
-            style="@style/Base.TextAppearance.AppCompat.Large"
-            /> -->
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/releaseDateVal"
-            android:id="@+id/trailers">
-        </ListView>
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/trailers"
-            android:id="@+id/reviews"></ListView>
+
     </RelativeLayout>
 </ScrollView>
