@@ -30,6 +30,7 @@ import models.MovieDataModel;
  */
 public class DetailActivityFragment extends Fragment {
 
+    public static final String MOVIE_DETAIL_KEY = "movieDetailKey";
 
     public DetailActivityFragment() {
     }
@@ -37,26 +38,23 @@ public class DetailActivityFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_detail, menu);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
-        Intent intent = getActivity().getIntent();
-        if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
+//        Intent intent = getActivity().getIntent();
+//        TextView tmp = (TextView) view.findViewById(R.id.detailTitle);
+//        tmp.setText("testing...");
+        Bundle args = getArguments();
+
+        if (args != null &&  args.containsKey(MOVIE_DETAIL_KEY)) {// intent.hasExtra(Intent.EXTRA_TEXT)) {
             try {
 //                String data = intent.getStringExtra(Intent.EXTRA_TEXT);
 //                JSONObject j = new JSONObject(data);
 //                MovieDataManager m = new MovieDataManager(j);
-                final MovieDataModel m = intent.getParcelableExtra(Intent.EXTRA_TEXT);
+                final MovieDataModel m = args.getParcelable(MOVIE_DETAIL_KEY);
                 TextView title = (TextView) view.findViewById(R.id.detailTitle);
                 title.setText(m.GetTitle());
                 ImageView img = (ImageView) view.findViewById(R.id.detailImage);
@@ -113,16 +111,4 @@ public class DetailActivityFragment extends Fragment {
         return view;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Log.i(DetailActivityFragment.class.getSimpleName(),"clicked "+item.getItemId());
-        if (item.getItemId() == R.id.action_settings) {
-            Intent intent = new Intent(getActivity(), SettingsActivity.class);
-            startActivity(intent);
-        } else if (item.getItemId() == android.R.id.home) {
-            NavUtils.navigateUpFromSameTask(getActivity());
-            return true;
-        }
-        return true;
-    }
 }

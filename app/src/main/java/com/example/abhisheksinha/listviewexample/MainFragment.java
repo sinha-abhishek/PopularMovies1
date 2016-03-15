@@ -78,6 +78,11 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     public static final String IS_FAV = "fav";
     private MyReciever myReciever;
 
+    public interface Callback {
+
+        public void onItemSelected(MovieDataModel m);
+    }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -219,14 +224,11 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                //MovieDataModel m = (MovieDataModel) parent.getAdapter().getItem(position);
                 if (cursor != null) {
                     try {
                         MovieDBModel movieDBModel = MovieDBModel.fromCursor(cursor);
                         MovieDataModel m = new MovieDataModel(movieDBModel);
-                        Intent movieDetailIntent = new Intent(getActivity(), DetailActivity.class)
-                                .putExtra(Intent.EXTRA_TEXT, m);
-                        startActivity(movieDetailIntent);
+                        ((Callback)getActivity()).onItemSelected(m);
                     } catch (Exception e) {
                         Log.e("MainFragment", e.getMessage(), e);
                         Toast.makeText(getActivity(), "Can't load this time", Toast.LENGTH_SHORT).show();
@@ -234,7 +236,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                 }
             }
         });
-        //spinner.setVisibility(View.VISIBLE);
 
         return rootView;
     }
