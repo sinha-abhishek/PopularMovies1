@@ -4,7 +4,8 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:background="@color/background_material_light"
-    android:layout_margin="5dp">
+    android:layout_margin="10dp"
+    android:padding="5dp">
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -15,7 +16,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/trailerText"
-        android:minHeight="?android:attr/listPreferredItemHeight"
         android:gravity="center_vertical|start"
         android:text="this is a test"
         style ="@style/Base.TextAppearance.AppCompat.Body1"

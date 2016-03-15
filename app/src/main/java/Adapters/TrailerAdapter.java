@@ -56,10 +56,6 @@ public class TrailerAdapter extends BaseAdapter {
     public class ViewHolder {
         public TextView textView;
 
-        public ViewHolder(View view) {
-
-            textView = (TextView) view.findViewById(R.id.trailerText);
-        }
     }
 
     @Override
@@ -67,7 +63,8 @@ public class TrailerAdapter extends BaseAdapter {
         ViewHolder holder;
         if (convertView == null) {
             convertView  = TrailerAdapter.inflater.inflate(R.layout.list_item, null);
-            holder = new ViewHolder(convertView);
+            holder = new ViewHolder();
+            holder.textView = (TextView) convertView.findViewById(R.id.trailerText);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder)convertView.getTag();
