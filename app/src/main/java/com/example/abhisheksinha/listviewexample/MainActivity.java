@@ -82,9 +82,13 @@ public class MainActivity extends ActionBarActivity implements  MainFragment.Cal
     @Override
     public void onMoviesLoaded(int activePosition, GridView gridView) {
         if (mHasTwoFragments && savedState == null) {
-            gridView.performItemClick(gridView.getAdapter().getView(activePosition, null, null),
-                    activePosition,
-                    gridView.getAdapter().getItemId(activePosition));
+            try {
+                gridView.performItemClick(gridView.getAdapter().getView(activePosition, null, null),
+                        activePosition,
+                        gridView.getAdapter().getItemId(activePosition));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }
