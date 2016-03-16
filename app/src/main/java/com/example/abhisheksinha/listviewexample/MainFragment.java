@@ -63,6 +63,7 @@ import services.RestClient;
  */
 public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
     public static final String ACTIVE_POS = "active_position";
+    public static final String SCROLL_POS = "scroll_position";
     private ProgressBar spinner;
     final String BASE_URL = "https://api.themoviedb.org/3/discover/movie?";
     final String API_KEY = "xxxxxxxxxxx";
@@ -80,6 +81,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     private MyReciever myReciever;
     private int mActivePosition;
     private GridView gridView;
+    private int mScrollPosition;
 
     public interface Callback {
 
@@ -100,6 +102,11 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         //movieDataModelList = MovieDBModel.ConvertList()
         outState.putParcelableArrayList(MOVIE_LIST_DATA, movieDataModelList);
         outState.putInt(ACTIVE_POS,mActivePosition);
+        if (gridView != null)
+            mScrollPosition = gridView.getFirstVisiblePosition();
+        else
+            mScrollPosition = 0;
+        outState.putInt(SCROLL_POS,mScrollPosition);
         super.onSaveInstanceState(outState);
     }
 
@@ -114,10 +121,12 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         sortPreference = syncConnPref;
         super.onCreate(savedInstanceState);
         mActivePosition = 0;
+
         if (savedInstanceState != null && savedInstanceState.containsKey(MOVIE_LIST_DATA) &&
                 savedInstanceState.containsKey(SettingsActivity.SORT_PREF_KEY) &&
                 sortPreference == savedInstanceState.getString(SettingsActivity.SORT_PREF_KEY)) {
             mActivePosition = savedInstanceState.getInt(ACTIVE_POS,0);
+            mScrollPosition = savedInstanceState.getInt(SCROLL_POS,0);
         } else {
             showSpinner = true;
 
@@ -293,6 +302,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             spinner.setVisibility(View.GONE);
         }
         adapter.swapCursor(data);
+        gridView.smoothScrollToPosition(mScrollPosition);
         if (adapter.getCount() == 0) {
 
         }
