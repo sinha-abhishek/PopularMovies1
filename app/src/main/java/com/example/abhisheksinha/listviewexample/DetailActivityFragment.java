@@ -60,6 +60,7 @@ public class DetailActivityFragment extends Fragment {
     LayoutInflater inflater;
     private ShareActionProvider mShareActionProvider;
 
+
     public DetailActivityFragment() {
     }
 
@@ -190,35 +191,40 @@ public class DetailActivityFragment extends Fragment {
                 models.addAll(videoResponseModel.results);
                 //trailerAdapter.clear();
                 //trailerAdapter.addAll(models);
-                LinearLayout list = (LinearLayout) getActivity().findViewById(R.id.trailers);
-                int i = 1;
-                for (final VideoModel model :
-                        models) {
-                    View vi = inflater.inflate(R.layout.list_item, null);
-                    TextView tv = (TextView) vi.findViewById(R.id.trailerText);
-                    tv.setText("Trailer " + i);
-                    i++;
-                    vi.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            //VideoModel model = (VideoModel) parent.getAdapter().getItem(position);
-                            String url = model.getYoutubeURL();
-                            if (url != "") {
-                                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                                //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
-                                if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-                                    startActivity(intent);
-                                } else {
-                                    Toast.makeText(getActivity(), "No supported app to view trailer", Toast.LENGTH_SHORT);
+                try {
+                    LinearLayout list = (LinearLayout) getActivity().findViewById(R.id.trailers);
+                    int i = 1;
+                    for (final VideoModel model :
+                            models) {
+                        View vi = inflater.inflate(R.layout.list_item, null);
+                        TextView tv = (TextView) vi.findViewById(R.id.trailerText);
+                        tv.setText("Trailer " + i);
+                        i++;
+                        vi.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                //VideoModel model = (VideoModel) parent.getAdapter().getItem(position);
+                                String url = model.getYoutubeURL();
+                                if (url != "") {
+                                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                                    //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
+                                    if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                                        startActivity(intent);
+                                    } else {
+                                        Toast.makeText(getActivity(), "No supported app to view trailer", Toast.LENGTH_SHORT);
+                                    }
                                 }
                             }
-                        }
-                    });
-                    list.addView(vi);
+                        });
+                        list.addView(vi);
 
-                }
-                if (models.size() > 0) {
-                    SetShareIntent();
+                    }
+                    if (models.size() > 0) {
+                        SetShareIntent();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //Toast.makeText(getActivity(),"Can't load trailer this time",Toast.LENGTH_SHORT);
                 }
             }
 
@@ -238,34 +244,39 @@ public class DetailActivityFragment extends Fragment {
             public void success(ReviewResponseModel responseModel, Response response) {
                 models.addAll(responseModel.reviews);
                 //reviewAdapter.clear();
-                LinearLayout ll = (LinearLayout) getActivity().findViewById(R.id.reviews);
-                int i = 1;
-                for (final ReviewModel model :
-                        models) {
-                    View vi = inflater.inflate(R.layout.review_list_item, null);
-                    TextView tv = (TextView) vi.findViewById(R.id.review_summary);
-                    TextView author = (TextView) vi.findViewById(R.id.reviewer);
-                    author.setText(model.author);
-                    tv.setText(model.content);
-                    i++;
-                    vi.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            //VideoModel model = (VideoModel) parent.getAdapter().getItem(position);
-                            String url = model.url;
-                            if (url != "") {
-                                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                                //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
-                                if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-                                    startActivity(intent);
-                                } else {
-                                    Toast.makeText(getActivity(), "No supported app to open reviews", Toast.LENGTH_SHORT);
+                try {
+                    LinearLayout ll = (LinearLayout) getActivity().findViewById(R.id.reviews);
+                    int i = 1;
+                    for (final ReviewModel model :
+                            models) {
+                        View vi = inflater.inflate(R.layout.review_list_item, null);
+                        TextView tv = (TextView) vi.findViewById(R.id.review_summary);
+                        TextView author = (TextView) vi.findViewById(R.id.reviewer);
+                        author.setText(model.author);
+                        tv.setText(model.content);
+                        i++;
+                        vi.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                //VideoModel model = (VideoModel) parent.getAdapter().getItem(position);
+                                String url = model.url;
+                                if (url != "") {
+                                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                                    //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
+                                    if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                                        startActivity(intent);
+                                    } else {
+                                        Toast.makeText(getActivity(), "No supported app to open reviews", Toast.LENGTH_SHORT);
+                                    }
                                 }
                             }
-                        }
-                    });
-                    ll.addView(vi);
-                    //reviewAdapter.addAll(reviews);
+                        });
+                        ll.addView(vi);
+
+                        //reviewAdapter.addAll(reviews);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
 

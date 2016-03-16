@@ -62,6 +62,7 @@ import services.RestClient;
  * Created by abhisheksinha on 12/31/15.
  */
 public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+    public static final String ACTIVE_POS = "active_position";
     private ProgressBar spinner;
     final String BASE_URL = "https://api.themoviedb.org/3/discover/movie?";
     final String API_KEY = "xxxxxxxxxxx";
@@ -77,6 +78,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     private static final int DATA_LOADER = 0;
     public static final String IS_FAV = "fav";
     private MyReciever myReciever;
+    private int mActivePosition;
+    private GridView gridView;
 
     public interface Callback {
 
@@ -85,6 +88,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         public void onOtherItemSelected(MenuItem item);
 
         public void onCreateOptions(Menu menu);
+
+        public void onMoviesLoaded(int activePosition, GridView gv);
     }
 
     @Override
@@ -94,6 +99,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         outState.putString(SettingsActivity.SORT_PREF_KEY, syncConnPref);
         //movieDataModelList = MovieDBModel.ConvertList()
         outState.putParcelableArrayList(MOVIE_LIST_DATA, movieDataModelList);
+        outState.putInt(ACTIVE_POS,mActivePosition);
         super.onSaveInstanceState(outState);
     }
 
@@ -107,9 +113,11 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         String syncConnPref = sharedPref.getString(SettingsActivity.SORT_PREF_KEY, "");
         sortPreference = syncConnPref;
         super.onCreate(savedInstanceState);
+        mActivePosition = 0;
         if (savedInstanceState != null && savedInstanceState.containsKey(MOVIE_LIST_DATA) &&
                 savedInstanceState.containsKey(SettingsActivity.SORT_PREF_KEY) &&
                 sortPreference == savedInstanceState.getString(SettingsActivity.SORT_PREF_KEY)) {
+            mActivePosition = savedInstanceState.getInt(ACTIVE_POS,0);
         } else {
             showSpinner = true;
 
@@ -130,6 +138,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         Intent intent = new Intent(getActivity(),
                 NetworkService.class);
         getActivity().startService(intent);
+        mActivePosition = 0;
     }
 
     @Override
@@ -168,10 +177,12 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         //lv.setAdapter(imageWithTextAdapter);
         adapter = new MovieDataAdapter(getActivity().getBaseContext(), null , false);
         lv.setAdapter(adapter);
+        gridView = lv;
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+                mActivePosition = position;
                 if (cursor != null) {
                     try {
                         MovieDBModel movieDBModel = MovieDBModel.fromCursor(cursor);
@@ -285,6 +296,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         if (adapter.getCount() == 0) {
 
         }
+        ((Callback)getActivity()).onMoviesLoaded(mActivePosition,gridView);
+
     }
 
     @Override

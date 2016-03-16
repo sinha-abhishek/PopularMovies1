@@ -8,6 +8,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.GridView;
 import android.widget.Toast;
 
 import models.MovieDataModel;
@@ -15,11 +16,13 @@ import models.MovieDataModel;
 public class MainActivity extends ActionBarActivity implements  MainFragment.Callback{
     private boolean mHasTwoFragments;
     private ShareActionProvider mShareActionProvider;
+    Bundle savedState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        savedState = savedInstanceState;
         if (findViewById(R.id.fragment_detail) != null) {
             mHasTwoFragments = true;
             if (savedInstanceState == null) {
@@ -73,6 +76,15 @@ public class MainActivity extends ActionBarActivity implements  MainFragment.Cal
             mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
             DetailActivityFragment df = (DetailActivityFragment)getSupportFragmentManager().findFragmentByTag(DetailActivity.DETAILFRAGMENT_TAG);
             df.SetShareProvider(mShareActionProvider);
+        }
+    }
+
+    @Override
+    public void onMoviesLoaded(int activePosition, GridView gridView) {
+        if (mHasTwoFragments && savedState == null) {
+            gridView.performItemClick(gridView.getAdapter().getView(activePosition, null, null),
+                    activePosition,
+                    gridView.getAdapter().getItemId(activePosition));
         }
     }
 }
