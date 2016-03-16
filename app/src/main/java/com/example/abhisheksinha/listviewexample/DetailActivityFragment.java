@@ -5,6 +5,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NavUtils;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -56,6 +58,7 @@ public class DetailActivityFragment extends Fragment {
     private TrailerAdapter trailerAdapter;
     private ReviewAdapter reviewAdapter;
     LayoutInflater inflater;
+    private ShareActionProvider mShareActionProvider;
 
     public DetailActivityFragment() {
     }
@@ -189,30 +192,33 @@ public class DetailActivityFragment extends Fragment {
                 //trailerAdapter.addAll(models);
                 LinearLayout list = (LinearLayout) getActivity().findViewById(R.id.trailers);
                 int i = 1;
-                for (final VideoModel model:
-                     models) {
-                   View vi = inflater.inflate(R.layout.list_item,null);
-                    TextView tv = (TextView)vi.findViewById(R.id.trailerText);
-                    tv.setText("Trailer "+ i);
+                for (final VideoModel model :
+                        models) {
+                    View vi = inflater.inflate(R.layout.list_item, null);
+                    TextView tv = (TextView) vi.findViewById(R.id.trailerText);
+                    tv.setText("Trailer " + i);
                     i++;
                     vi.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             //VideoModel model = (VideoModel) parent.getAdapter().getItem(position);
-                        String url = model.getYoutubeURL();
-                        if (url != "") {
-                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                            //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
-                            if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-                                startActivity(intent);
-                            } else {
-                                Toast.makeText(getActivity(), "No supported app to view trailer", Toast.LENGTH_SHORT);
+                            String url = model.getYoutubeURL();
+                            if (url != "") {
+                                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                                //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
+                                if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                                    startActivity(intent);
+                                } else {
+                                    Toast.makeText(getActivity(), "No supported app to view trailer", Toast.LENGTH_SHORT);
+                                }
                             }
-                        }
                         }
                     });
                     list.addView(vi);
 
+                }
+                if (models.size() > 0) {
+                    SetShareIntent();
                 }
             }
 
@@ -268,5 +274,23 @@ public class DetailActivityFragment extends Fragment {
                 Toast.makeText(getActivity(), "Can't load reviews this time", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void SetShareIntent() {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+       // shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        shareIntent.setType("text/plain");
+        if (trailers.size() > 0) {
+            shareIntent.putExtra(Intent.EXTRA_TEXT, trailers.get(0).getYoutubeURL());
+            if(mShareActionProvider != null) {
+                mShareActionProvider.setShareIntent(shareIntent);
+            }
+            return ;//shareIntent;
+        }
+        return ;
+    }
+
+    public void SetShareProvider(ShareActionProvider provider) {
+        mShareActionProvider = provider;
     }
 }

@@ -3,7 +3,9 @@ package com.example.abhisheksinha.listviewexample;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,6 +16,7 @@ import models.MovieDataModel;
 public class DetailActivity extends ActionBarActivity {
 
     public static final String DETAILFRAGMENT_TAG = "detail_fragment";
+    private ShareActionProvider mShareActionProvider;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,10 +28,12 @@ public class DetailActivity extends ActionBarActivity {
             args.putParcelable(DetailActivityFragment.MOVIE_DETAIL_KEY, data);
             DetailActivityFragment detailActivityFragment = new DetailActivityFragment();
             detailActivityFragment.setArguments(args);
+            detailActivityFragment.SetShareProvider(mShareActionProvider);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_detail, detailActivityFragment, DETAILFRAGMENT_TAG)
                     .commit();
              }
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
@@ -36,6 +41,12 @@ public class DetailActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_detail, menu);
+        MenuItem item = menu.findItem(R.id.action_share);
+        if (item != null) {
+            mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+            DetailActivityFragment df = (DetailActivityFragment)getSupportFragmentManager().findFragmentByTag(DetailActivity.DETAILFRAGMENT_TAG);
+            df.SetShareProvider(mShareActionProvider);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 

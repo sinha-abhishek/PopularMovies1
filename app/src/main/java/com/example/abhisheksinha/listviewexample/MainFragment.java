@@ -81,6 +81,10 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     public interface Callback {
 
         public void onItemSelected(MovieDataModel m);
+
+        public void onOtherItemSelected(MenuItem item);
+
+        public void onCreateOptions(Menu menu);
     }
 
     @Override
@@ -106,35 +110,9 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         if (savedInstanceState != null && savedInstanceState.containsKey(MOVIE_LIST_DATA) &&
                 savedInstanceState.containsKey(SettingsActivity.SORT_PREF_KEY) &&
                 sortPreference == savedInstanceState.getString(SettingsActivity.SORT_PREF_KEY)) {
-//            showSpinner = false;
-//            movieDataModelList = savedInstanceState.getParcelableArrayList(MOVIE_LIST_DATA);
         } else {
             showSpinner = true;
-//            movieDataModelList = new ArrayList<MovieDataModel>();
-//
-//
-//            Log.i(MainFragment.class.getSimpleName(), syncConnPref);
-//            RestClient c = new RestClient();
-//            ApiService apiService = c.getApiService();
-//            apiService.getMovies(API_KEY, syncConnPref, new Callback<DiscoverResponseModel>() {
-//                @Override
-//                public void success(DiscoverResponseModel dataModels, Response response) {
-//                    ArrayList<MovieDataModel> movieDataModels = dataModels.getMovieDataModels();
-//                    spinner.setVisibility(View.GONE);
-//                    movieDataModelList = movieDataModels;
-//                    imageWithTextAdapter.addAll(movieDataModels);
-//                    showSpinner = false;
-//                    if (spinner != null) {
-//                        spinner.setVisibility(View.GONE);
-//                    }
-//                    removeSpinner();
-//                }
-//
-//                @Override
-//                public void failure(RetrofitError error) {
-//                    Log.e("RETRO", error.toString());
-//                }
-//            });
+
         }
 
     }
@@ -175,39 +153,9 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         } else {
             spinner = (ProgressBar) getActivity().findViewById(R.id.spinnerView);
             spinner.setVisibility(View.GONE);
-            //imageWithTextAdapter.addAll(movieDataModelList);
         }
         getLoaderManager().initLoader(DATA_LOADER, null, this);
-//        if (showSpinner) {
-//            spinner = (ProgressBar) getActivity().findViewById(R.id.spinnerView);
-//            spinner.setVisibility(View.VISIBLE);
-//        } else {
-//            spinner = (ProgressBar) getActivity().findViewById(R.id.spinnerView);
-//            spinner.setVisibility(View.GONE);
-//        }
-//        spinner = (ProgressBar) getActivity().findViewById(R.id.spinnerView);
-//        spinner.setVisibility(View.VISIBLE);
-//        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-//        String syncConnPref = sharedPref.getString(SettingsActivity.SORT_PREF_KEY, "");
-//        Log.i(MainFragment.class.getSimpleName(), syncConnPref);
-//        RestClient c = new RestClient();
-//        ApiService apiService = c.getApiService();
-//        apiService.getMovies(API_KEY, syncConnPref, new Callback<DiscoverResponseModel>() {
-//            @Override
-//            public void success(DiscoverResponseModel dataModels, Response response) {
-//                List<MovieDataModel> movieDataModels = dataModels.getMovieDataModels();
-//                spinner.setVisibility(View.GONE);
-//                imageWithTextAdapter.addAll(movieDataModels);
-//                for (MovieDataModel m:movieDataModels) {
-//                    Log.i("RETRO",m.GetTitle()+" "+m.GetVoteAvg());
-//                }
-//            }
-//
-//            @Override
-//            public void failure(RetrofitError error) {
-//                Log.e("RETRO", error.toString());
-//            }
-//        });
+
     }
 
 
@@ -245,6 +193,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
         inflater.inflate(R.menu.menu_main, menu);
+        ((Callback)getActivity()).onCreateOptions(menu);
     }
 
     @Override
@@ -258,6 +207,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             Intent intent = new Intent(getActivity(),
                     NetworkService.class);
             getActivity().startService(intent);
+        } else {
+            ((Callback)getActivity()).onOtherItemSelected(item);
         }
         return true;
     }

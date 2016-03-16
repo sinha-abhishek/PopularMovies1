@@ -77,4 +77,5 @@
     <string name="addfav">Add to favorite</string>
     <string name="remFav">Remove from favorite</string>
     <string name="refresh">Refresh</string>
+    <string name="action_share">Share</string>
 </resources>
