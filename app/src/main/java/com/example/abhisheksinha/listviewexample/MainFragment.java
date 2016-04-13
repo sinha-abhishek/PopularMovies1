@@ -1,9 +1,13 @@
 package com.example.abhisheksinha.listviewexample;
 
+import android.accounts.Account;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.Fragment;
 import android.app.LoaderManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -144,9 +148,21 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     private void StartFetch() {
-        Intent intent = new Intent(getActivity(),
-                NetworkService.class);
-        getActivity().startService(intent);
+        Account mAccount = MainActivity.CreateSyncAccount(getActivity());
+        Bundle settingsBundle = new Bundle();
+        settingsBundle.putBoolean(
+                ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        settingsBundle.putBoolean(
+                ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        /*
+         * Request the sync for the default account, authority, and
+         * manual sync settings
+         */
+        //ContentResolver resolver = getActivity().getContentResolver();
+        ContentResolver.requestSync(mAccount, MainActivity.AUTHORITY, settingsBundle);
+//        Intent intent = new Intent(getActivity(),
+//                NetworkService.class);
+//        getActivity().startService(intent);
         mActivePosition = 0;
     }
 
@@ -173,7 +189,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             spinner.setVisibility(View.GONE);
         }
         getLoaderManager().initLoader(DATA_LOADER, null, this);
-
     }
 
 
@@ -196,7 +211,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                     try {
                         MovieDBModel movieDBModel = MovieDBModel.fromCursor(cursor);
                         MovieDataModel m = new MovieDataModel(movieDBModel);
-                        ((Callback)getActivity()).onItemSelected(m);
+                        ((Callback) getActivity()).onItemSelected(m);
                     } catch (Exception e) {
                         Log.e("MainFragment", e.getMessage(), e);
                         Toast.makeText(getActivity(), "Can't load this time", Toast.LENGTH_SHORT).show();
@@ -204,7 +219,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                 }
             }
         });
-
         return rootView;
     }
 
@@ -224,13 +238,27 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         } else if (item.getItemId() == R.id.refreshBtn) {
             //adapter.
             spinner.setVisibility(View.VISIBLE);
-            Intent intent = new Intent(getActivity(),
-                    NetworkService.class);
-            getActivity().startService(intent);
+            StartFetch();
+//            Intent intent = new Intent(getActivity(),
+//                    NetworkService.class);
+//            getActivity().startService(intent);
+
         } else {
             ((Callback)getActivity()).onOtherItemSelected(item);
         }
         return true;
+    }
+
+    public static class AlarmReciever extends BroadcastReceiver {
+
+
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Intent intent2 = new Intent(context,
+                    NetworkService.class);
+            context.startService(intent2);
+        }
     }
 
     private class MyReciever extends BroadcastReceiver {
@@ -307,6 +335,10 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
         }
         ((Callback)getActivity()).onMoviesLoaded(mActivePosition,gridView);
+//        Intent intent1 = new Intent(getActivity(), MainFragment.AlarmReciever.class);
+//        PendingIntent alarmIntent = PendingIntent.getBroadcast(getActivity(), 0, intent1, 0);
+//        AlarmManager alarmManager = (AlarmManager)getActivity().getSystemService(Context.ALARM_SERVICE);
+//        alarmManager.set(AlarmManager.RTC, System.currentTimeMillis() + 10000, alarmIntent);
 
     }
 

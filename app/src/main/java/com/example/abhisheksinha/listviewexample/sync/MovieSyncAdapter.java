@@ -1,15 +1,18 @@
-package com.example.abhisheksinha.listviewexample;
+package com.example.abhisheksinha.listviewexample.sync;
 
-import android.app.Service;
+import android.accounts.Account;
+import android.content.AbstractThreadedSyncAdapter;
+import android.content.ContentProviderClient;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
-import android.os.IBinder;
-import android.support.annotation.Nullable;
+import android.content.SyncResult;
+import android.os.Bundle;
 import android.util.Log;
 
-import com.example.abhisheksinha.listviewexample.sync.DummyAuthenticator;
-import com.example.abhisheksinha.listviewexample.sync.MovieSyncAdapter;
+import com.example.abhisheksinha.listviewexample.MainFragment;
+import com.example.abhisheksinha.listviewexample.R;
 
-import java.net.Authenticator;
 import java.util.List;
 
 import models.DiscoverResponseModel;
@@ -22,38 +25,33 @@ import services.ApiService;
 import services.RestClient;
 
 /**
- * Created by abhishek on 11/03/16.
+ * Created by abhishek on 13/04/16.
  */
-public class NetworkService extends Service {
-    private static final String LOG_TAG = "NetworkService";
+public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
+    ContentResolver mContentResolver;
     public static final String NETWORK_ACTION = "network_action";
     public static final String POPULAR_UPDATED = "popular_updated";
     public static final String RATED_UPDATED = "rated_updated";
-    private static MovieSyncAdapter sSyncAdapter = null;
-    // Object to use as a thread-safe lock
-    private static final Object sSyncAdapterLock = new Object();
+    private static final String LOG_TAG = "MovieSyncAdapter";
 
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return sSyncAdapter.getSyncAdapterBinder();
+    public MovieSyncAdapter(Context context, boolean autoInitialize) {
+
+        super(context, autoInitialize);
+
+        mContentResolver = context.getContentResolver();
+    }
+
+    public MovieSyncAdapter(Context context, boolean autoInitialize, boolean allowParallelSyncs) {
+        super(context, autoInitialize, allowParallelSyncs);
+
+        mContentResolver = context.getContentResolver();
     }
 
     @Override
-    public void onCreate() {
-        synchronized (sSyncAdapterLock) {
-            if (sSyncAdapter == null) {
-                sSyncAdapter = new MovieSyncAdapter(getApplicationContext(), true);
-            }
-        }
-        super.onCreate();
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         RestClient restClient = new RestClient();
         ApiService apiService = restClient.getApiService();
-        apiService.getMovies(MainFragment.API_KEY, getString(R.string.sort_popularity_val), new Callback<DiscoverResponseModel>() {
+        apiService.getMovies(MainFragment.API_KEY, getContext().getString(R.string.sort_popularity_val), new Callback<DiscoverResponseModel>() {
             @Override
             public void success(DiscoverResponseModel discoverResponseModel, Response response) {
                 Log.i(LOG_TAG, "got " + discoverResponseModel.toString());
@@ -61,7 +59,7 @@ public class NetworkService extends Service {
                 MovieDBModel.UpdatePopular(models);
                 Intent intent1 = new Intent(NETWORK_ACTION);
                 intent1.putExtra(POPULAR_UPDATED, true);
-                sendBroadcast(intent1);
+                getContext().sendBroadcast(intent1);
             }
 
             @Override
@@ -69,7 +67,7 @@ public class NetworkService extends Service {
 
             }
         });
-        apiService.getMovies(MainFragment.API_KEY, getString(R.string.sort_vote_val), new Callback<DiscoverResponseModel>() {
+        apiService.getMovies(MainFragment.API_KEY, getContext().getString(R.string.sort_vote_val), new Callback<DiscoverResponseModel>() {
             @Override
             public void success(DiscoverResponseModel discoverResponseModel, Response response) {
                 Log.i(LOG_TAG, "got " + discoverResponseModel.toString());
@@ -77,7 +75,7 @@ public class NetworkService extends Service {
                 MovieDBModel.UpdateRated(models);
                 Intent intent1 = new Intent(NETWORK_ACTION);
                 intent1.putExtra(RATED_UPDATED, true);
-                sendBroadcast(intent1);
+                getContext().sendBroadcast(intent1);
             }
 
             @Override
@@ -85,7 +83,5 @@ public class NetworkService extends Service {
 
             }
         });
-        super.onStartCommand(intent, flags, startId);
-        return Service.START_STICKY;
     }
 }

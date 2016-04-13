@@ -1,6 +1,10 @@
 package com.example.abhisheksinha.listviewexample;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.FragmentManager;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
@@ -17,6 +21,14 @@ public class MainActivity extends ActionBarActivity implements  MainFragment.Cal
     private boolean mHasTwoFragments;
     private ShareActionProvider mShareActionProvider;
     Bundle savedState;
+
+    public static final String AUTHORITY = "com.example.abhisheksinha.Movies";
+    // An account type, in the form of a domain name
+    public static final String ACCOUNT_TYPE = "dummy.com";
+    // The account name
+    public static final String ACCOUNT = "dummyaccount";
+    // Instance fields
+    Account mAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +52,58 @@ public class MainActivity extends ActionBarActivity implements  MainFragment.Cal
 //        Intent intent = new Intent(this,
 //                NetworkService.class);
 //        startService(intent);
+        mAccount = CreateSyncAccount(this);
 
+        ContentResolver resolver = getContentResolver();
+
+       // resolver.addPeriodicSync(mAccount,);
+
+    }
+
+
+    /**
+     * Create a new dummy account for the sync adapter
+     *
+     * @param context The application context
+     */
+    public static Account CreateSyncAccount(Context context) {
+        // Create the account type and default account
+        Account newAccount = new Account(
+                context.getString(R.string.app_name), ACCOUNT_TYPE);
+        // Get an instance of the Android account manager
+        AccountManager accountManager =
+                (AccountManager) context.getSystemService(
+                        ACCOUNT_SERVICE);
+        /*
+         * Add the account and account type, no password or user data
+         * If successful, return the Account object, otherwise report an error.
+         *
+         */
+        if (null == accountManager.getPassword(newAccount)) {
+            if (accountManager.addAccountExplicitly(newAccount, "", null)) {
+
+            /*
+             * If you don't set android:syncable="true" in
+             * in your <provider> element in the manifest,
+             * then call context.setIsSyncable(account, AUTHORITY, 1)
+             * here.
+             */
+                ContentResolver.addPeriodicSync(newAccount,
+                        AUTHORITY,
+                        Bundle.EMPTY,
+                        30);
+
+                ContentResolver.setSyncAutomatically(newAccount, AUTHORITY, true);
+
+            } else {
+                return null;
+            /*
+             * The account exists or some other error occurred. Log this, report it,
+             * or handle it internally.
+             */
+            }
+        }
+        return newAccount;
     }
 
 
